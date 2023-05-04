@@ -2,6 +2,8 @@ package com.haitaos.microservices.currencyconversionservice.controller;
 
 import com.haitaos.microservices.currencyconversionservice.entity.CurrencyConversion;
 import com.haitaos.microservices.currencyconversionservice.proxy.CurrencyExchangeProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +15,15 @@ import java.math.BigDecimal;
 @RestController
 public class CurrencyConversionController {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private RestTemplate restTemplate;
     private CurrencyExchangeProxy currencyExchangeProxy;
 
-    public CurrencyConversionController(CurrencyExchangeProxy currencyExchangeProxy) {
+    public CurrencyConversionController(CurrencyExchangeProxy currencyExchangeProxy,
+                                        RestTemplate restTemplate
+                                        ) {
         this.currencyExchangeProxy = currencyExchangeProxy;
+        this.restTemplate = restTemplate;
     }
 
     @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
@@ -24,7 +31,9 @@ public class CurrencyConversionController {
             @PathVariable("from") String from,
             @PathVariable("to") String to,
             @PathVariable("quantity") BigDecimal quantity) {
-        ResponseEntity<CurrencyConversion> responseEntity = new RestTemplate()
+        logger.info("calculateCurrencyConversion called with {} to {} with {}",
+                from, to, quantity);
+        ResponseEntity<CurrencyConversion> responseEntity = this.restTemplate
                 .getForEntity("http://localhost:8000/currency-exchange/from/{from}/to/{to}",
                         CurrencyConversion.class,
                         from,
@@ -53,7 +62,8 @@ public class CurrencyConversionController {
             @PathVariable("from") String from,
             @PathVariable("to") String to,
             @PathVariable("quantity") BigDecimal quantity) {
-
+        logger.info("calculateCurrencyConversionFeign called with {} to {} with {}",
+                from, to, quantity);
         CurrencyConversion currencyConversion = this.currencyExchangeProxy
                 .retrieveExchangeValue(from, to);
 

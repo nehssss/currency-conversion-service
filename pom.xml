@@ -10,8 +10,8 @@
     </parent>
     <groupId>com.haitaos.microservices</groupId>
     <artifactId>currency-conversion-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>currency-conversion-service</name>
+    <version>0.0.12-SNAPSHOT</version>
+    <name>currency-conversion-service-kubernetes</name>
     <description>currency-conversion-service</description>
     <properties>
         <java.version>17</java.version>
@@ -26,13 +26,58 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-config</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- Spring Boot 3+ Tracing -->
+
+        <!-- Micrometer > Brave/OpenTelemetry > Zipkin -->
+
+        <!-- Micrometer - Vendor-neutral application observability facade. Instrument your JVM-based application code without vendor lock-in.  Observation (Metrics & Logs) + Tracing.-->
+
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation</artifactId>
         </dependency>
+
+        <!-- Brave as Bridge -->
+
+        <!--
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.zipkin.reporter2</groupId
+            <artifactId>zipkin-reporter-brave</artifactId>
+        </dependency>
+        -->
+
+        <!-- Open Telemetry as Bridge -->
+        <!-- Open Telemetry - Simplified Observability (metrics, logs, and traces) -->
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>io.opentelemetry</groupId>-->
+<!--            <artifactId>opentelemetry-exporter-zipkin</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- COMMON CHANGES + -->
+        <!-- Enables tracing of REST API calls made using Feign - V3 ONLY-->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-micrometer</artifactId>
         </dependency>
 
         <dependency>
@@ -69,6 +114,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <image>
+                        <name>nehssss/mm-${project.artifactId}:${project.version}</name>
+                    </image>
+                    <pullPolicy>IF_NOT_PRESENT</pullPolicy>
+                </configuration>
             </plugin>
         </plugins>
     </build>
